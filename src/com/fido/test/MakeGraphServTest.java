@@ -23,16 +23,15 @@ public class MakeGraphServTest {
 
 	
 
-	//@Test
+	@Test
 	public void testCreate() throws ClassNotFoundException, SQLException {
 		List<Station> commonList=dao.getCommonList();
 		for(int i=0;i<commonList.size();i++){
 			 common.addCommonStation(commonList.get(i));
 		}	
-                 service.create(3);
-                 service.create(4);
-                 service.create(5);
-                 service.create(6);
+        for(int k=0;k<8;k++){
+      	  service.create(k+1);
+        }
                  
            Graph graph=service.getGraph();
            HashMap<Integer,Vertex> vertexMap=graph.getVertexMap();

@@ -51,6 +51,7 @@ public class MakePathServ {
 		// 先把起点放入栈中，并做标记已放入栈中了
 		stack.push(start);
 		ifexist.put(start.getSnumber(), true);
+		dfs(startname,endname);
 		LinkedList<Station> nearList = vertexMap.get(start.getSnumber())
 				.getEdgeList();// 获得起点的所有邻接结点
 		while (!stack.isEmpty()) {
@@ -71,7 +72,6 @@ public class MakePathServ {
 			if (stack.peek().getSnumber() == end.getSnumber()) {
 				ArrayList<Station> tempList=new ArrayList<Station>(); //找到了其中的一条路线了
 				for (Station station : stack) {
-					System.out.println(station.getSname());
 					tempList.add(station); 
 					
 				}
@@ -79,12 +79,13 @@ public class MakePathServ {
 				ifexist.put(stack.pop().getSnumber(), false);// 弹出来之后标明未进栈
 				return;
 			}
-			LinkedList<Station> nearList = vertexMap.get(start.getSnumber())
+			LinkedList<Station> tempNearList = vertexMap.get(start.getSnumber())
 					.getEdgeList();
-			for (int i = 0; i < nearList.size(); i++) {
-				dfs(nearList.get(i).getSname(), endname);
+			for (int k = 0; k< tempNearList.size(); k++) {
+				dfs(tempNearList.get(k).getSname(), endname);
 			}
-		} else
-			return;
+			//如果该站点在栈中但它的所有邻接站点都遍历完了也要出栈不然会出现站点跳乱	，同时记得凡是出栈都要把标志重新设置		
+			ifexist.put(stack.pop().getSnumber(), false);
+		} 
 	}
 }

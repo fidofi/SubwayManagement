@@ -25,18 +25,18 @@ public class MakePathServTest {
 		for(int i=0;i<commonList.size();i++){
 			 common.addCommonStation(commonList.get(i));
 		}	
-                 service.create(3);
-                 service.create(4);
-                 service.create(5);
-                 service.create(6);
+		
+              for(int k=0;k<8;k++){
+            	  service.create(k+1);
+              }
                  
            Graph graph=service.getGraph();
        	MakePathServ serv=new MakePathServ(graph);
-       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "体育西路");
+       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "大学城南");
        	for(int i=0;i<path.size();i++){
        		  ArrayList<Station> temp=path.get(i);
        		  for(int k=0;k<temp.size();k++){
-       			    System.out.print(temp.get(k).getSname()+"、");
+       			    System.out.print(temp.get(k).getSname()+"→");
        		  }
        		  System.out.println("****");
        	}
