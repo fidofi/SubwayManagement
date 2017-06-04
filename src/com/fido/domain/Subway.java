@@ -1,21 +1,25 @@
 package com.fido.domain;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * 
  * @author: fido
  * @date:2017年5月22日 下午6:44:53
- * @description：公交车类，即一条线路
- *
+ * @description：一条线路
+ * 
  */
-public class Bus {
-	private int bnumber;// 公交编号
-	private String bname;// 公交号码
-
-	public Bus() {
+public class Subway implements Serializable  {
+	private int bnumber;// 地铁编号
+	private String bname;// 地铁名字
+	public Subway() {
 
 	}
 
-	public Bus(int bnumber, String bname) {
+	public Subway(int bnumber, String bname) {
 		this.bnumber = bnumber;
 		this.bname = bname;
 	}
@@ -35,5 +39,6 @@ public class Bus {
 	public void setBname(String bname) {
 		this.bname = bname;
 	}
+
 
 }

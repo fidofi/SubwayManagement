@@ -2,12 +2,14 @@ package com.fido.service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.fido.dao.MakeGraphDao;
 import com.fido.domain.CommonStation;
 import com.fido.domain.Graph;
 import com.fido.domain.Station;
+import com.fido.domain.Subway;
 import com.fido.domain.Vertex;
 
 /**
@@ -20,6 +22,7 @@ import com.fido.domain.Vertex;
 public class MakeGraphServ {
 	private MakeGraphDao dao = new MakeGraphDao();
 	private Graph graph;
+	private CommonStation common=new CommonStation();
 
 	public MakeGraphServ() {
 		graph = new Graph();
@@ -45,10 +48,18 @@ public class MakeGraphServ {
 	 * @author:by fido
 	 * @param station
 	 * @return 添加站点信息到顶点集合里，注意公共站点的处理
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
-	public void insertVertex(Station station) {
+	public void insertVertex(Station station) throws ClassNotFoundException, SQLException {
 		String sname = station.getSname();// 该顶点的名称
 		int snumber = station.getSnumber();// 该顶点的编号
+		List<Subway> subwayList=dao.getSubwayList(sname);//设置该站点所属线路
+		HashMap<Integer,Subway> subwayMap=new HashMap<Integer,Subway>();
+		for(int i=0;i<subwayList.size();i++){
+			 subwayMap.put(subwayList.get(i).getBnumber(), subwayList.get(i));
+		}
+		station.setSubwayMap(subwayMap);
 		if (CommonStation.getCommonMap().containsKey(sname)) { // 如果属于原先确定好的公共站点
 			if (CommonStation.getCommonMap().get(sname).get(1) ==1) {// 并且不是第一次插入
 				return;
@@ -56,7 +67,7 @@ public class MakeGraphServ {
 			else{ //属于公共站点，但还没有插入到图中
 				ArrayList<Integer> list=CommonStation.getCommonMap().get(sname);
 				list.set(1, 1);
-				CommonStation.getCommonMap().put(sname, list);//做个标记表示已经差如果了		
+				CommonStation.getCommonMap().put(sname, list);//做个标记表示已经插入过了		
 			}
 		} 
 			// 加入顶点到顶点map里面
@@ -82,8 +93,6 @@ public class MakeGraphServ {
 		// 获得两个要关联的站点的名称
 		String startName = start.getSname();
 		String endName = end.getSname();
-//		System.out.println("站点名："+startName+"站点编号："+startIndex);
-//		System.out.println("站点名："+endName+"站点编号："+endIndex);
 		if (CommonStation.getCommonMap().containsKey(startName)) {
 			startIndex = CommonStation.getCommonMap().get(startName).get(0);// 获得重复站点的编号
 		}
@@ -120,6 +129,27 @@ public class MakeGraphServ {
 			System.out.println("根据线路构造图出现了问题");
 			e.printStackTrace();
 		}
+	}
+	public MakeGraphDao getDao() {
+		return dao;
+	}
+
+
+
+	public void setDao(MakeGraphDao dao) {
+		this.dao = dao;
+	}
+
+
+
+	public CommonStation getCommon() {
+		return common;
+	}
+
+
+
+	public void setCommon(CommonStation common) {
+		this.common = common;
 	}
 
 }

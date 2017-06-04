@@ -28,10 +28,15 @@ public class MakeGraphServTest {
 		List<Station> commonList=dao.getCommonList();
 		for(int i=0;i<commonList.size();i++){
 			 common.addCommonStation(commonList.get(i));
+			 System.out.println(commonList.get(i));
 		}	
         for(int k=0;k<8;k++){
       	  service.create(k+1);
         }
+        service.create(302);
+        Station one=dao.getStationByName("林和西");
+        Station two=dao.getStationByName("体育西路");
+        service.insertEdge(one, two);
                  
            Graph graph=service.getGraph();
            HashMap<Integer,Vertex> vertexMap=graph.getVertexMap();

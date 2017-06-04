@@ -1,5 +1,6 @@
 package com.fido.domain;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
@@ -9,7 +10,7 @@ import java.util.LinkedList;
  * @description:图的顶点类
  * 
  */
-public class Vertex {
+public class Vertex implements Serializable  {
 	private LinkedList<Station> edgeList;// 用链表存储该站点的邻接结点
 	private Station station;// 该站点的信息
 
