@@ -27,6 +27,11 @@ public class MakePathServ {
 
 	public MakePathServ(Graph graph) {
 		vertexMap = graph.getVertexMap();// 获得该图的站点集合
+		
+
+	}
+
+	public List<ArrayList<Station>> findAllPath(String startname, String endname) {
 		List<Integer> vertexIdList = new ArrayList<Integer>();
 		List<Vertex> vertexList = new ArrayList<Vertex>();
 		for (Map.Entry<Integer, Vertex> entry : vertexMap.entrySet()) {
@@ -39,10 +44,8 @@ public class MakePathServ {
 			nameIdMap.put(vertexList.get(i).getStation().getSname(), vertexList
 					.get(i).getStation());
 		}
-
-	}
-
-	public List<ArrayList<Station>> findAllPath(String startname, String endname) {
+		//上面这段本来是写在构造方法的，可是这样测试的时候发现，若两次输入起点终点互换的查询时，会报错原因是map中已经记录了，故这里要
+//		每一次寻找都要重置map
 		stack = new Stack<Station>();// 栈实现遍历
 		min=Integer.MAX_VALUE;//最小值记得重置为整数的最大，不然一直会记录着第一次查询成功的最小值
 	    List<ArrayList<Station>> path=new ArrayList<ArrayList<Station>>();//存放找到的线路
@@ -68,14 +71,12 @@ public class MakePathServ {
 	public void dfs(String startname, String endname, List<ArrayList<Station>> path) {
 		Station start = nameIdMap.get(startname);
 		Station end = nameIdMap.get(endname);
-
 		if (!ifexist.get(start.getSnumber())) { // 未在栈中
 			stack.push(start);
 			ifexist.put(start.getSnumber(), true);// 放入栈中然后标明已经进栈了
 
 			if (stack.peek().getSnumber() == end.getSnumber()) {
 				min=stack.size();//重置
-				System.out.println("当前最短的"+min);
 				ArrayList<Station> tempList=new ArrayList<Station>(); //找到了其中的一条路线了
 				for (Station station : stack) {
 					tempList.add(station); 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,6 +45,8 @@ public class MainFrame {
     private MakePathServ serv;
     private Graph graph;//图结构
     
+    private JLabel timeLabel;//显示程序用时
+    
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		MainFrame window = new MainFrame();
@@ -53,6 +56,7 @@ public class MainFrame {
 	}
 	public MainFrame() {
 		service =new MakeGraphServ();
+		//界面一开始就判断是否存在图结构的磁盘文件，若没有要新建，有的话直接搜索，不用新建
 		File file=new File("D://graph.txt");
 		if(!file.exists()){
 			List<Station> commonList=service.getDao().getCommonList();
@@ -92,7 +96,10 @@ public class MainFrame {
         };
         panel.setLayout(null);
 		frame.setContentPane(panel);
-		
+	    timeLabel = new JLabel("查询用时：");
+		timeLabel.setFont(new Font("方正卡通简体", Font.PLAIN, 16));
+		timeLabel.setBounds(10, 300, 200, 15);
+		panel.add(timeLabel);
 
 		JLabel titleLabel = new JLabel("广州地铁");
 		titleLabel.setBounds(197, 10, 114, 40);
@@ -121,15 +128,26 @@ public class MainFrame {
 		buttonByStation.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//  textArea.setText(null);
+				long startTime=System.currentTimeMillis();   //获取开始时间
+				  textArea.setText(null);
 				  String startName=start.getText();
 				  String endName=end.getText();
 				   if(startName!=null&&endName!=null&&startName.trim()!=""&&endName.trim()!=""){
+					   System.out.println(startName+"***"+endName);
 					List<ArrayList<Station>> path=serv.findAllPath(startName, endName);
+					System.out.println("原本有的长度为"+path.size());
+			       	HashMap<Integer,Integer> findLess=new HashMap<Integer,Integer>();//找出换乘次数最少的
+			       	for(int i=0;i<path.size();i++){
+			       		System.out.print("放进去的I"+i+"、");
+			       		 findLess.put(i, 0);
+			       	}
 			       	String change=null;	
+			       	int writeIndex=(path.size()>6?path.size()-3:0);
 			       	int j=0;
-			       	for(int i=path.size()>6?path.size()-3:0;i<path.size();i++){ //取最后三个记录			       	 
+			       	for(int i=path.size()-1;i>0;i--){ //取最后三个记录,最短放第一个	
+                         if(i>=writeIndex){
 			       		textArea.append("方案"+(++j)+":");
+                         }
 			       		  ArrayList<Station> temp=path.get(i);
 			       		  for(int k=0;k<temp.size();k++){
 			       			  if(k!=0&&k!=temp.size()-1){
@@ -141,21 +159,80 @@ public class MainFrame {
 			       				  }
 			       			  }
 			       			  if(change!=null){
+			       				if(i>=writeIndex)
 			       				  textArea.append("在"+temp.get(k).getSname()+"换乘"+change+"→");
+			       				int value=findLess.get(i);
+			       				  findLess.put(i, ++value);
+			       				  int current=findLess.get(i);//获得当前的换乘次数
 
 			       			  }
 			       			  else{
+			       				if(i>=writeIndex){
 			       				  if(k!=temp.size()-1)
 			       				  textArea.append(temp.get(k).getSname()+"→"); 
 			       				  else{
 			       					textArea.append(temp.get(k).getSname()+"\n\r");   
 			       				  textArea.append("*******************"+"\n\r");
 			       				  }
+			       				}
 			       			  }
 			       			  change=null;
 			       		  }
 			       	}
+			    	//主要是为了找出换乘最小的线路，如何知道map的value，求所有value最小时对应的Key 即path集合里的下标
+			       	List<Integer> index=new ArrayList<Integer>();
+			     for(Map.Entry<Integer, Integer> entry:findLess.entrySet()){
+			    	  int key=entry.getKey();
+			    	  int value=entry.getValue();
+			    	  index.add(value);
+			     }
+			     System.out.println("长度"+index.size());
+			     int min=index.get(1);
+			     System.out.println("初始最小值为"+min);
+			     int dex=0;
+			     for(int i=2;i<index.size();i++){
+			    	 System.out.println("最小值："+min);
+			    	   if(min>=index.get(i)){
+			    		   min=index.get(i);
+			    		   dex=i;
+			    	   }
+			     }
+			     System.out.println("下标："+dex);
+			     //接下来输出换乘次数最少的路线，无非是确定好path中对应的下标，其实可以在上面抽取相同方法出来写的，因为接下来的都是重复代码。。之前没注意
+			   //  int changeto =(path.size()>6?(path.size()-dex-1):dex);
+			     int changeto=dex;
+			     System.out.println("确定好的下标："+changeto);
+			     System.out.println(path.size());
+			     ArrayList<Station> lessChange=path.get(changeto);//换乘次数最少的,这里有个坑，注意两次下标的起点是不一样的
+			     textArea.append("换乘次数最少的路线为："+"\n\r");
+			     String change2=null;
+			     for(int k=0;k<lessChange.size();k++){
+	       			  if(k!=0&&k!=lessChange.size()-1){
+	       				  HashMap<Integer,Subway> map1= lessChange.get(k-1).getSubwayMap();
+	       				  HashMap<Integer,Subway> map2=lessChange.get(k).getSubwayMap();
+	       				  HashMap<Integer,Subway> map3=lessChange.get(k+1).getSubwayMap();
+	       				  if(!MapUtils.ifsame(map1, map3)){
+	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
+	       				  }
+	       			  }
+	       			  if(change2!=null){
+	       				  textArea.append("在"+lessChange.get(k).getSname()+"换乘"+change2+"→");
+
+	       			  }
+	       			  else{
+	       				  if(k!=lessChange.size()-1)
+	       				  textArea.append(lessChange.get(k).getSname()+"→"); 
+	       				  else{
+	       					textArea.append(lessChange.get(k).getSname()+"\n\r");   
+	       				  }
+	       			  }
+	       			  change2=null;
+			     }
 			}
+				   long endTime=System.currentTimeMillis(); //获取结束时间		   
+				   System.out.println("程序运行时间： "+(double)(endTime-startTime)/1000+"s");
+				   String timeByStation=(double)(endTime-startTime)/1000+"秒";
+				   timeLabel.setText("查询用时:"+timeByStation);
 			}
 		});
 
@@ -209,6 +286,7 @@ public class MainFrame {
 		buttonBySubway.setFont(new Font("方正卡通简体", Font.PLAIN, 18));
 		buttonBySubway.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				long startTime=System.currentTimeMillis();   //获取开始时间
 				       textArea.setText(null);
 				 		List<Station> list=service.getDao().getStationListByBname((String)comboBox.getSelectedItem());	
 				 		for(int i=0;i<list.size();i++){
@@ -217,6 +295,11 @@ public class MainFrame {
 				 			else
 				 				textArea.append(list.get(i).getSname());	
 				 		}
+				 		long endTime=System.currentTimeMillis(); //获取结束时间
+
+				 	      System.out.println("程序运行时间： "+(double)(endTime-startTime)/1000+"s");
+				 	     String timeBySubway=(double)(endTime-startTime)/1000+"秒";
+						   timeLabel.setText("查询用时:"+timeBySubway);
 			}
 		});
 		buttonBySubway.setBounds(150, 122, 93, 23);
@@ -242,5 +325,7 @@ public class MainFrame {
 		textArea.setBackground(Color.WHITE);
 		textArea.setLineWrap(true);
 		panel.add(panelOutput);
+		
+
 	}
 }

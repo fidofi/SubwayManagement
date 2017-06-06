@@ -2,8 +2,10 @@ package com.fido.test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -40,7 +42,11 @@ public class MakePathServTest {
                  
            Graph graph=service.getGraph();
        	MakePathServ serv=new MakePathServ(graph);
-       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "动物园");
+       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "西朗");
+       	HashMap<Integer,Integer> findLess=new HashMap<Integer,Integer>();//找出换乘次数最少的
+       	for(int i=0;i<path.size();i++){
+       		 findLess.put(i, 0);
+       	}
        	String change=null;
        	for(int i=0;i<path.size();i++){
        		  ArrayList<Station> temp=path.get(i);
@@ -53,18 +59,41 @@ public class MakePathServTest {
        					    change=MapUtils.getSameSubwayName(map1,map2, map3);
        				  }
        			  }
+       			  
        			  if(change!=null){
-       				  System.out.print("在"+temp.get(k).getSname()+"换乘"+change+"→");
-
+       				  String str="在"+temp.get(k).getSname()+"换乘"+change+"→";
+       				  int value=findLess.get(i);
+       				  findLess.put(i, ++value);
+       				  int current=findLess.get(i);//获得当前的换乘次数
+       				  System.out.println(current);
+       				  System.out.print(str);
        			  }
        			  else{
-       				  System.out.print(temp.get(k).getSname()+"→");
-       				  
+       				  String str2=temp.get(k).getSname()+"→"; 	
+       				  System.out.print(str2);
        			  }
        			  change=null;
        		  }
-       		  System.out.println("****");
+       		  System.out.println("**");
        	}
+       	//主要是为了找出换乘最小的线路，如何知道map的value，求所有value最小时对应的Key 即path集合里的下标
+       	List<Integer> index=new ArrayList<Integer>();
+     for(Map.Entry<Integer, Integer> entry:findLess.entrySet()){
+    	  int key=entry.getKey();
+    	  int value=entry.getValue();
+    	  index.add(value);
+     }
+     int min=index.get(0);
+     int dex=0;
+     for(int i=1;i<index.size();i++){
+    	   if(min>=index.get(i)){
+    		   min=index.get(i);
+    		   System.out.println(min);
+    		   dex=i;
+    	   }
+     }
+     System.out.println(dex);
+     System.out.println(path.get(dex));
        	long endTime=System.currentTimeMillis(); //获取结束时间
 
       System.out.println("程序运行时间： "+(double)(endTime-startTime)/1000+"s");

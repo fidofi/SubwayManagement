@@ -9,6 +9,9 @@ public class MapUtils {
     	   for(Integer snumber:map1.keySet()){
     		     if(map2.containsKey(snumber))
     		    	 return true;
+    		     //3号线北延段和3号线被视为同一条线，其实这里不直接写在程序中比较利于维护
+//    		     if((map2.containsKey(302)&&map1.containsKey(3))||(map2.containsKey(3)&&map1.containsKey(302)))
+//    		    	 return true;
     	   }
     	   return false;
       }
