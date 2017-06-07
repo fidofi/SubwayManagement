@@ -144,26 +144,38 @@ public class MainFrame {
 			       	String change=null;	
 			       	int writeIndex=(path.size()>6?path.size()-3:0);
 			       	int j=0;
-			       	for(int i=path.size()-1;i>0;i--){ //取最后三个记录,最短放第一个	
+			       	for(int i=path.size()-1;i>=0;i--){ //取最后三个记录,最短放第一个	
+			       		int current=0;
                          if(i>=writeIndex){
 			       		textArea.append("方案"+(++j)+":");
                          }
 			       		  ArrayList<Station> temp=path.get(i);
 			       		  for(int k=0;k<temp.size();k++){
 			       			  if(k!=0&&k!=temp.size()-1){
+			       				  if(current!=0){
 			       				  HashMap<Integer,Subway> map1= temp.get(k-1).getSubwayMap();
 			       				  HashMap<Integer,Subway> map2=temp.get(k).getSubwayMap();
 			       				  HashMap<Integer,Subway> map3=temp.get(k+1).getSubwayMap();
 			       				  if(!MapUtils.ifsame(map1, map3)){
 			       					    change=MapUtils.getSameSubwayName(map1,map2, map3);
 			       				  }
+			       				  }
+			       				  else{
+				       				  HashMap<Integer,Subway> map1= temp.get(0).getSubwayMap();
+				       				  HashMap<Integer,Subway> map2=temp.get(k).getSubwayMap();
+				       				  HashMap<Integer,Subway> map3=temp.get(k+1).getSubwayMap();
+				       				  if(!MapUtils.ifsame(map1, map3)){
+				       					    change=MapUtils.getSameSubwayName(map1,map2, map3);
+				       				  }
+			       				  }
+			       					  
 			       			  }
 			       			  if(change!=null){
 			       				if(i>=writeIndex)
 			       				  textArea.append("在"+temp.get(k).getSname()+"换乘"+change+"→");
 			       				int value=findLess.get(i);
 			       				  findLess.put(i, ++value);
-			       				  int current=findLess.get(i);//获得当前的换乘次数
+			       				   current=findLess.get(i);//获得当前的换乘次数
 
 			       			  }
 			       			  else{
@@ -187,10 +199,10 @@ public class MainFrame {
 			    	  index.add(value);
 			     }
 			     System.out.println("长度"+index.size());
-			     int min=index.get(1);
+			     int min=index.get(0);
 			     System.out.println("初始最小值为"+min);
 			     int dex=0;
-			     for(int i=2;i<index.size();i++){
+			     for(int i=1;i<index.size();i++){
 			    	 System.out.println("最小值："+min);
 			    	   if(min>=index.get(i)){
 			    		   min=index.get(i);
@@ -199,24 +211,37 @@ public class MainFrame {
 			     }
 			     System.out.println("下标："+dex);
 			     //接下来输出换乘次数最少的路线，无非是确定好path中对应的下标，其实可以在上面抽取相同方法出来写的，因为接下来的都是重复代码。。之前没注意
-			   //  int changeto =(path.size()>6?(path.size()-dex-1):dex);
+			  //   int changeto =(path.size()>6?(path.size()-dex-1):dex);
 			     int changeto=dex;
 			     System.out.println("确定好的下标："+changeto);
 			     System.out.println(path.size());
 			     ArrayList<Station> lessChange=path.get(changeto);//换乘次数最少的,这里有个坑，注意两次下标的起点是不一样的
 			     textArea.append("换乘次数最少的路线为："+"\n\r");
 			     String change2=null;
-			     for(int k=0;k<lessChange.size();k++){
-	       			  if(k!=0&&k!=lessChange.size()-1){
-	       				  HashMap<Integer,Subway> map1= lessChange.get(k-1).getSubwayMap();
-	       				  HashMap<Integer,Subway> map2=lessChange.get(k).getSubwayMap();
-	       				  HashMap<Integer,Subway> map3=lessChange.get(k+1).getSubwayMap();
-	       				  if(!MapUtils.ifsame(map1, map3)){
-	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
-	       				  }
-	       			  }
+			     int current2=0;
+			     for(int k=0;k<lessChange.size();k++){    
+      	       			  if(k!=0&&k!=lessChange.size()-1){
+                                  if(current2!=0){
+            	       				  HashMap<Integer,Subway> map1= lessChange.get(k-1).getSubwayMap();
+            	       				  HashMap<Integer,Subway> map2=lessChange.get(k).getSubwayMap();
+            	       				  HashMap<Integer,Subway> map3=lessChange.get(k+1).getSubwayMap();
+            	       				  if(!MapUtils.ifsame(map1, map3)){
+            	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
+            	       				  }
+                                  }
+                                  else{
+                                	  HashMap<Integer,Subway> map1= lessChange.get(0).getSubwayMap();
+            	       				  HashMap<Integer,Subway> map2=lessChange.get(k).getSubwayMap();
+            	       				  HashMap<Integer,Subway> map3=lessChange.get(k+1).getSubwayMap();
+            	       				  if(!MapUtils.ifsame(map1, map3)){
+            	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
+            	       				  }
+                                  }
+                                	  
+    	       			  }
 	       			  if(change2!=null){
 	       				  textArea.append("在"+lessChange.get(k).getSname()+"换乘"+change2+"→");
+	       				  current2++;
 
 	       			  }
 	       			  else{
