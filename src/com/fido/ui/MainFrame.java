@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -54,27 +55,28 @@ public class MainFrame {
 		window.frame.setResizable(false);
 
 	}
+
 	public MainFrame() {
-		service =new MakeGraphServ();
-		//界面一开始就判断是否存在图结构的磁盘文件，若没有要新建，有的话直接搜索，不用新建
-		File file=new File("D://graph.txt");
-		if(!file.exists()){
-			List<Station> commonList=service.getDao().getCommonList();
-			for(int i=0;i<commonList.size();i++){
-				 service.getCommon().addCommonStation(commonList.get(i));
-				 System.out.println(commonList.get(i));
-			}	
-	        for(int k=0;k<8;k++){
-	      	  service.create(k+1);
-	        }
-	        service.create(302);
-	        Station one=service.getDao().getStationByName("林和西");
-	        Station two=service.getDao().getStationByName("体育西路");
-	        service.insertEdge(one, two);           
-	        service.getDao().write2txt(service.getGraph());		
+		service = new MakeGraphServ();
+		// 界面一开始就判断是否存在图结构的磁盘文件，若没有要新建，有的话直接搜索，不用新建
+		File file = new File("D://graph.txt");
+		if (!file.exists()) {
+			List<Station> commonList = service.getDao().getCommonList();
+			for (int i = 0; i < commonList.size(); i++) {
+				service.getCommon().addCommonStation(commonList.get(i));
+				System.out.println(commonList.get(i));
+			}
+			for (int k = 0; k < 8; k++) {
+				service.create(k + 1);
+			}
+			service.create(302);
+			Station one = service.getDao().getStationByName("林和西");
+			Station two = service.getDao().getStationByName("体育西路");
+			service.insertEdge(one, two);
+			service.getDao().write2txt(service.getGraph());
 		}
-		graph=service.getDao().read();
-		serv=new MakePathServ(graph);
+		graph = service.getDao().read();
+		serv = new MakePathServ(graph);
 		initialize();
 	}
 
@@ -133,8 +135,16 @@ public class MainFrame {
 				  String startName=start.getText();
 				  String endName=end.getText();
 				   if(startName!=null&&endName!=null&&startName.trim()!=""&&endName.trim()!=""){
-					   System.out.println(startName+"***"+endName);
+					   if(startName.equals(endName)){
+						   JOptionPane.showMessageDialog(null, "起点与终点相同！");
+						   return;
+					   }
+					 System.out.println(startName+"***"+endName);
 					List<ArrayList<Station>> path=serv.findAllPath(startName, endName);
+					if(path==null){
+						JOptionPane.showMessageDialog(null, "未找到该路径！");
+						   return;
+					}
 					System.out.println("原本有的长度为"+path.size());
 			       	HashMap<Integer,Integer> findLess=new HashMap<Integer,Integer>();//找出换乘次数最少的
 			       	for(int i=0;i<path.size();i++){
@@ -142,12 +152,13 @@ public class MainFrame {
 			       		 findLess.put(i, 0);
 			       	}
 			       	String change=null;	
-			       	int writeIndex=(path.size()>6?path.size()-3:0);
+//			       	int writeIndex=(path.size()>6?path.size()-3:0);
+			       	int writeIndex=path.size()-1;
 			       	int j=0;
 			       	for(int i=path.size()-1;i>=0;i--){ //取最后三个记录,最短放第一个	
 			       		int current=0;
                          if(i>=writeIndex){
-			       		textArea.append("方案"+(++j)+":");
+			       		textArea.append("途径站点最少："+"\n\r");
                          }
 			       		  ArrayList<Station> temp=path.get(i);
 			       		  for(int k=0;k<temp.size();k++){
@@ -236,13 +247,11 @@ public class MainFrame {
             	       				  if(!MapUtils.ifsame(map1, map3)){
             	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
             	       				  }
-                                  }
-                                	  
+                                  }                               	  
     	       			  }
 	       			  if(change2!=null){
 	       				  textArea.append("在"+lessChange.get(k).getSname()+"换乘"+change2+"→");
 	       				  current2++;
-
 	       			  }
 	       			  else{
 	       				  if(k!=lessChange.size()-1)

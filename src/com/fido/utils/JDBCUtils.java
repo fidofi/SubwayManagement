@@ -19,7 +19,6 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  */
 public class JDBCUtils {
 	private static ComboPooledDataSource  datasource=null;
-
 	//静态代码块初始化
 	static{
 		datasource=new ComboPooledDataSource("mysql_fido");//c3p0的连接池,默认寻找c3p0-config.xml这个文件
@@ -28,7 +27,6 @@ public class JDBCUtils {
     public static Connection getConnection() throws SQLException{
     	return datasource.getConnection();
     } 
-
     /**
      * 
      * @datae：2017年5月24日
@@ -122,6 +120,5 @@ public class JDBCUtils {
 		 }
 		 rs=null;
 	 }
-    }
-	
+    }	
 }

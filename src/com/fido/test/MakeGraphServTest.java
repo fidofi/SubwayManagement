@@ -20,9 +20,7 @@ public class MakeGraphServTest {
 	MakeGraphServ service=new MakeGraphServ();
 	MakeGraphDao dao=new MakeGraphDao();
 	CommonStation common=new CommonStation();
-
-	
-
+	//测试构造图结构
 	@Test
 	public void testCreate() throws ClassNotFoundException, SQLException {
 		List<Station> commonList=dao.getCommonList();
@@ -36,8 +34,7 @@ public class MakeGraphServTest {
         service.create(302);
         Station one=dao.getStationByName("林和西");
         Station two=dao.getStationByName("体育西路");
-        service.insertEdge(one, two);
-                 
+        service.insertEdge(one, two);               
            Graph graph=service.getGraph();
            HashMap<Integer,Vertex> vertexMap=graph.getVertexMap();
            for(Map.Entry<Integer, Vertex> entry:vertexMap.entrySet()){
@@ -48,8 +45,6 @@ public class MakeGraphServTest {
         	    	  System.out.print(list.get(i)+"、");
         	     }
         	     System.out.println(" ");
-           }
-	       
+           }	       
 	}
-
 }

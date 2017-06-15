@@ -12,9 +12,7 @@ import java.util.HashMap;
  */
 
 public class Graph implements Serializable  {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private HashMap<Integer, Vertex> vertexMap;// 图的各顶点用HashMap来保存（因为为了后续的插入方便将原先的顺序表改成了HashMap）
 	private int vertexNum;// 图的顶点数

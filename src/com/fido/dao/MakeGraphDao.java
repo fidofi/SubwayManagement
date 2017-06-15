@@ -244,8 +244,6 @@ public class MakeGraphDao {
     	finally{
     		JDBCUtils.release(conn, ps, rs);
     	}
-    	return this.getStationListByBus(bnumber);
-    	 
-    	 
+    	return this.getStationListByBus(bnumber);    	 
     }
 }

@@ -42,7 +42,7 @@ public class MakePathServTest {
                  
            Graph graph=service.getGraph();
        	MakePathServ serv=new MakePathServ(graph);
-       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "西朗");
+       	List<ArrayList<Station>> path=serv.findAllPath("长湴", "珠江新城");
        	HashMap<Integer,Integer> findLess=new HashMap<Integer,Integer>();//找出换乘次数最少的
        	for(int i=0;i<path.size();i++){
        		 findLess.put(i, 0);
