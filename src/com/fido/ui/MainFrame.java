@@ -8,10 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,11 +25,12 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.fido.domain.Graph;
+import com.fido.domain.ListAndCount;
 import com.fido.domain.Station;
-import com.fido.domain.Subway;
 import com.fido.service.MakeGraphServ;
 import com.fido.service.MakePathServ;
-import com.fido.utils.MapUtils;
+import com.fido.utils.ShowPathUtils;
+import com.fido.utils.SortUtils;
 
 public class MainFrame {
 
@@ -130,137 +128,48 @@ public class MainFrame {
 		buttonByStation.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				long startTime=System.currentTimeMillis();   //获取开始时间
-				  textArea.setText(null);
-				  String startName=start.getText();
-				  String endName=end.getText();
-				   if(startName!=null&&endName!=null&&startName.trim()!=""&&endName.trim()!=""){
-					   if(startName.equals(endName)){
-						   JOptionPane.showMessageDialog(null, "起点与终点相同！");
-						   return;
-					   }
-					List<ArrayList<Station>> path=serv.findAllPath(startName, endName);
-					if(path==null){
-						JOptionPane.showMessageDialog(null, "未找到该路径！");
-						   return;
+				long startTime = System.currentTimeMillis(); // 获取开始时间
+				textArea.setText(null);
+				String startName = start.getText();
+				String endName = end.getText();
+				if (startName != null && endName != null
+						&& startName.trim() != "" && endName.trim() != "") {
+					if (startName.equals(endName)) {
+						JOptionPane.showMessageDialog(null, "起点与终点相同！");
+						return;
 					}
-			       	HashMap<Integer,Integer> findLess=new HashMap<Integer,Integer>();//找出换乘次数最少的
-			       	for(int i=0;i<path.size();i++){
-			       		 findLess.put(i, 0);
-			       	}
-			       	String change=null;	
-			       	//int writeIndex=(path.size()>6?path.size()-3:0);
-			       	int writeIndex=path.size()-1;
-			       	int j=0;
-			       	for(int i=path.size()-1;i>=0;i--){ //取最后三个记录,最短放第一个	
-//			       		int current=0;
-                         if(i>=writeIndex){
-			       		textArea.append("途径站点最少："+"\n\r");
-                         }
-			       		  ArrayList<Station> temp=path.get(i);
-			       		  System.out.println(temp.size());
-			       		  for(int k=0;k<temp.size();k++){
-			       			  if(k!=0&&k!=temp.size()-1){
-//			       				  if(current!=0){
-			       				  Station map1= temp.get(k-1);
-			       				  Station map2=temp.get(k);
-			       				  Station map3=temp.get(k+1);
-			       				  MapUtils.show(map1);
-			       				MapUtils.show(map2);
-			       				MapUtils.show(map3);
-			       				  if(!MapUtils.ifsame(map1, map3)){
-			       					    change=MapUtils.getSameSubwayName(map1,map2, map3);
-			       				  }
-//			       				  }
-			       				  else{
-			       					  Station map11= temp.get(0);
-				       				  Station map12=temp.get(k);
-				       				  Station map13=temp.get(k+1);
-				       				  if(!MapUtils.ifsame(map11, map13)){
-				       					    change=MapUtils.getSameSubwayName(map11,map12, map13);
-				       				  }
-			       				  }	  
-			       			  }
-			       			  if(change!=null){
-			       				if(i>=writeIndex)
-			       				 textArea.append("在"+temp.get(k).getSname()+"换乘"+change+"→");
-			       				int value=findLess.get(i);
-			       				 findLess.put(i, ++value);
-//			       				   current=findLess.get(i);//获得当前的换乘次数
+					//找到了所有的路线
+					List<ListAndCount> path=serv.findAllPath(startName, endName);
+					SortUtils.quickSort(path, 0, path.size()-1);//进行排序
+					//显示前3条
+					if(path.size()<=3){
+						  for(int i=0;i<path.size();i++){
+							  textArea.append("方案"+(i+1)+":\n\r");
+							 ArrayList<Station> tempList= path.get(i).getList();
+							 String str=ShowPathUtils.showPath(tempList);
+							      textArea.append(str);  
+						  }
+					}
+					else{
+						for(int i=0;i<3;i++){
+							ArrayList<Station> tempList= path.get(i).getList();
+							 String str=ShowPathUtils.showPath(tempList);
+							 textArea.append("方案"+(i+1)+":\n\r");
+							      textArea.append(str);  
+						}
+					}
+					String str=ShowPathUtils.showLessChange(path);
+					textArea.append("换乘最少:\n\r");
+					textArea.append(str);
+					   
 
-			       			  }
-			       			  else{
-			       				if(i>=writeIndex){
-			       				  if(k!=temp.size()-1)
-			       				  textArea.append(temp.get(k).getSname()+"→"); 
-			       				  else{
-			       					textArea.append(temp.get(k).getSname()+"\n\r");   
-			       				  textArea.append("*******************"+"\n\r");
-			       				  }
-			       				}
-			       			  }
-			       			  change=null;
-			       		  }
-			       	}
-			    	//主要是为了找出换乘最小的线路，如何知道map的value，求所有value最小时对应的Key 即path集合里的下标
-			       	List<Integer> index=new ArrayList<Integer>();
-			     for(Map.Entry<Integer, Integer> entry:findLess.entrySet()){
-			    	  int key=entry.getKey();
-			    	  int value=entry.getValue();
-			    	  index.add(value);
-			     }
-			     int min=index.get(0);
-			     int dex=0;
-			     for(int i=1;i<index.size();i++){
-			    	   if(min>=index.get(i)){
-			    		   min=index.get(i);
-			    		   dex=i;
-			    	   }
-			     }
-			     //接下来输出换乘次数最少的路线，无非是确定好path中对应的下标，其实可以在上面抽取相同方法出来写的，因为接下来的都是重复代码。。之前没注意
-			  //   int changeto =(path.size()>6?(path.size()-dex-1):dex);
-			     int changeto=dex;
-			     ArrayList<Station> lessChange=path.get(changeto);//换乘次数最少的,这里有个坑，注意两次下标的起点是不一样的
-			     textArea.append("换乘次数最少的路线为："+"\n\r");
-			     String change2=null;
-			     int current2=0;
-			     for(int k=0;k<lessChange.size();k++){    
-      	       			  if(k!=0&&k!=lessChange.size()-1){
-                                  if(current2!=0){
-                                	  Station map1= lessChange.get(k-1);
-    			       				  Station map2=lessChange.get(k);
-    			       				  Station map3=lessChange.get(k+1);
-            	       				  if(!MapUtils.ifsame(map1, map3)){
-            	       					    change2=MapUtils.getSameSubwayName(map1,map2,map3);
-            	       				  }
-                                  }
-                                  else{
-                                	  Station map1= lessChange.get(0);
-				       				  Station map2=lessChange.get(k);
-				       				  Station map3=lessChange.get(k+1);
-            	       				  if(!MapUtils.ifsame(map1, map3)){
-            	       					    change2=MapUtils.getSameSubwayName(map1,map2, map3);
-            	       				  }
-                                  }                               	  
-    	       			  }
-	       			  if(change2!=null){
-	       				  textArea.append("在"+lessChange.get(k).getSname()+"换乘"+change2+"→");
-	       				  current2++;
-	       			  }
-	       			  else{
-	       				  if(k!=lessChange.size()-1)
-	       				  textArea.append(lessChange.get(k).getSname()+"→"); 
-	       				  else{
-	       					textArea.append(lessChange.get(k).getSname()+"\n\r");   
-	       				  }
-	       			  }
-	       			  change2=null;
-			     }
-			}
-				   long endTime=System.currentTimeMillis(); //获取结束时间		   
-				   System.out.println("程序运行时间： "+(double)(endTime-startTime)/1000+"s");
-				   String timeByStation=(double)(endTime-startTime)/1000+"秒";
-				   timeLabel.setText("查询用时:"+timeByStation);
+				}
+				long endTime = System.currentTimeMillis(); // 获取结束时间
+				System.out.println("程序运行时间： " + (double) (endTime - startTime)
+						/ 1000 + "s");
+				String timeByStation = (double) (endTime - startTime) / 1000
+						+ "秒";
+				timeLabel.setText("查询用时:" + timeByStation);
 			}
 		});
 

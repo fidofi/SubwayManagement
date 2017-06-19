@@ -7,12 +7,16 @@ import com.fido.domain.Station;
 import com.fido.domain.Subway;
 
 public class MapUtils {
-      public static boolean ifsame(Station first,Station third){
+      public static boolean ifsame(Station first,Station second,Station third){
     	      HashMap<Integer,Subway> map1= first.getSubwayMap();
-			  HashMap<Integer,Subway> map2=third.getSubwayMap();
+    	      HashMap<Integer,Subway> map2= second.getSubwayMap();
+			  HashMap<Integer,Subway> map3=third.getSubwayMap();
     	   for(Integer snumber:map1.keySet()){
-    		     if(map2.containsKey(snumber)){
+    		     if(map3.containsKey(snumber)){
+    		    	 if(map2.containsKey(snumber)){
     		    	     return true;
+    		    	 }
+    		    	 return false;
     		     }
     	   }
     	   return false;
@@ -21,16 +25,17 @@ public class MapUtils {
     	  HashMap<Integer,Subway> map1=first.getSubwayMap();
 		  HashMap<Integer,Subway> map2=second.getSubwayMap();
 		  HashMap<Integer,Subway> map3=third.getSubwayMap();
-    	  if((!ifsame(first,third))){
+    	  if((!ifsame(first,second,third))){
     	  for(Integer snumber:map2.keySet()){
  		     if(map3.containsKey(snumber)){
  		    	 return map3.get(snumber).getBname();
  		     }
+ 		     //也是3号线的两条分支换乘的特殊处理~
  		     if(map3.containsKey(302)&&map2.containsKey(3)){
- 		    	     return map2.get(3).getBname();
+ 		    	     return map3.get(302).getBname();
  		     }
  		     if(map3.containsKey(3)&&map2.containsKey(302)){
- 		    	return map2.get(302).getBname();
+ 		    	return map3.get(3).getBname();
  		     }
  	   }
     	  }
@@ -41,7 +46,7 @@ public class MapUtils {
       public static void show(Station station){
     	  HashMap<Integer,Subway> map =station.getSubwayMap();
     	  for(Map.Entry<Integer, Subway> entry:map.entrySet()){
-    		  System.out.println(entry.getKey()+"**"+entry.getValue().getBname());
+    		  System.out.print(entry.getKey()+"**"+entry.getValue().getBname()+"、");
     	  }
       }
 }
