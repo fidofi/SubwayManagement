@@ -22,7 +22,7 @@ import com.fido.utils.MapUtils;
 //	MakeGraphServ service=new MakeGraphServ();
 //	MakeGraphDao dao=new MakeGraphDao();
 //	CommonStation common=new CommonStation();
-//	
+	
 //
 //	@Test
 //	public void testFindAllPaht() throws ClassNotFoundException, SQLException {
@@ -100,7 +100,7 @@ import com.fido.utils.MapUtils;
 //       			
 //	}
 //
-//	//@Test
+//	@Test
 //	public void testDfs() throws ClassNotFoundException, SQLException {
 //		List<Station> commonList=dao.getCommonList();
 //		for(int i=0;i<commonList.size();i++){
@@ -113,6 +113,7 @@ import com.fido.utils.MapUtils;
 //                 
 //           Graph graph=service.getGraph();
 //       	MakePathServ serv=new MakePathServ(graph);
-//    //   	serv.dfs("长湴", "珠江新城");
+//       	serv.findAllPath("长湴", "浔峰岗");
 //	}
+//}
 //}

@@ -43,8 +43,8 @@ public class MakePathServ {
 			nameIdMap.put(vertexList.get(i).getStation().getSname(), vertexList
 					.get(i).getStation());
 		}
-		// 上面这段本来是写在构造方法的，可是这样测试的时候发现，若两次输入起点终点互换的查询时，会报错原因是map中已经记录了，故这里要
-		// 每一次寻找都要重置map
+// 上面这段本来是写在构造方法的，可是这样测试的时候发现，若两次输入起点终点互换的查询时，会报错原因是map中已经记录了，故这里要
+// 每一次寻找都要重置map
 		stack = new Stack<Station>();// 栈实现遍历
 
 		List<ListAndCount> path = new ArrayList<ListAndCount>();// 存放找到的线路

@@ -7,6 +7,9 @@ import com.fido.domain.Station;
 import com.fido.domain.Subway;
 
 public class MapUtils {
+	
+	//判断第一第三点是否存在相同线路，若不同，则第二个点肯定是换乘点
+	//当第一第三点存在相同线路时，还要判断它们三者是否同时存在相同线路，若不存在，则第二个点也是换乘点
       public static boolean ifsame(Station first,Station second,Station third){
     	      HashMap<Integer,Subway> map1= first.getSubwayMap();
     	      HashMap<Integer,Subway> map2= second.getSubwayMap();
@@ -21,6 +24,7 @@ public class MapUtils {
     	   }
     	   return false;
       }
+      //返回换乘点和她下一个点的公共线路，就是要显示的换乘线 
       public static String getSameSubwayName(Station first,Station second,Station third){
     	  HashMap<Integer,Subway> map1=first.getSubwayMap();
 		  HashMap<Integer,Subway> map2=second.getSubwayMap();
@@ -30,11 +34,12 @@ public class MapUtils {
  		     if(map3.containsKey(snumber)){
  		    	 return map3.get(snumber).getBname();
  		     }
- 		     //也是3号线的两条分支换乘的特殊处理~
- 		     if(map3.containsKey(302)&&map2.containsKey(3)){
+// 		     //也是3号线的两条分支换乘的特殊处理~
+ 		     if(map3.containsKey(302)&&map2.containsKey(3)&&!third.getSname().equals("体育西路")){
+ 		    	 
  		    	     return map3.get(302).getBname();
  		     }
- 		     if(map3.containsKey(3)&&map2.containsKey(302)){
+ 		     if(map3.containsKey(3)&&map2.containsKey(302)&&!third.getSname().equals("体育西路")){
  		    	return map3.get(3).getBname();
  		     }
  	   }
